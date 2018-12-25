@@ -10,7 +10,7 @@ public abstract class ScalecubeMicroservicesFixture implements Fixture {
   }
 
   @Override
-  public <T> T call(Class<? extends T> service) {
+  public <T> T proxyFor(Class<? extends T> service) {
     return microservices.call().create().api(service);
   }
 
