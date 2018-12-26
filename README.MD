@@ -1,18 +1,19 @@
 # Test utilities for Scalecube
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b0ccd1fb212142dba806884f839bdaf5)](https://www.codacy.com/app/ScaleCube/scalecube-test-utils?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=scalecube/scalecube-test-utils&amp;utm_campaign=Badge_Grade)
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/b0ccd1fb212142dba806884f839bdaf5)](https://www.codacy.com/app/ScaleCube/scalecube-test-utils?utm_source=github.com&utm_medium=referral&utm_content=scalecube/scalecube-test-utils&utm_campaign=Badge_Coverage)
 
 As a test developer I want to have the ability to test some components in multiple types of environment.
 
 Some environments would be with mocks.
 Some would mock only data-layers and create all components in this test JVM.
-Some environments would be as docker containers plus real machines hybrid.
-
-**You name it!!!**
+Some environments would be as docker containers plus real machines hybrid. **You name it!!!**
 
 But as the tests writer - I truly don't care. 
 
 So what's the plan?
 
-## Let's split environments and tests 
+## Let's split environments and tests
 
 let's say we have two interfaces:
 
@@ -34,7 +35,7 @@ public interface PalindromeService {
 
 Both of them are in the system under test.
 
-### First goes the test:
+### The test
 
 ```java
 
@@ -66,6 +67,9 @@ This test is testing EchoService and PalindromeService.
 As you can see, these are given to the test code as plain parameters to the test method as interfaces.
 So where are the concrete objects?
 in the Fixtures: here is an example of a tested system in-memory `SlowServiceFixture` and `FasterServiceFixture`:
+
+### The fixtures
+
 ```java
 public class SlowServiceFixture implements Fixture {
 
@@ -200,5 +204,3 @@ public class DockerfileFixture implements Fixture {
 }
 ```
 which will do the same in dockers!
-
- 
