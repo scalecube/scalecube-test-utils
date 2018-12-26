@@ -1,3 +1,5 @@
+package org.testcontainers.utility;
+
 import io.scalecube.test.fixtures.BaseTest;
 import io.scalecube.test.fixtures.Fixtures;
 import io.scalecube.test.fixtures.WithFixture;

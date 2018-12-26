@@ -1,3 +1,5 @@
+package org.testcontainers.utility;
+
 import io.scalecube.test.fixtures.EchoService;
 import io.scalecube.test.fixtures.Fixture;
 import io.scalecube.test.fixtures.PalindromeService;

@@ -1,3 +1,5 @@
+package io.scalecube.services;
+
 import io.scalecube.services.Microservices;
 import io.scalecube.test.fixtures.Fixture;
 
