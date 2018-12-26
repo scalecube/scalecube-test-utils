@@ -5,24 +5,24 @@ import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
- * a Fixture is an abstraction of a test environment. Some implementations would create the
+ * A Fixture is an abstraction of a test environment. Some implementations would create the
  * environment itself, some may create some mocks, and others can just create client to access
  * a real running environment.
- *
  * The test should not care how the environment looks like.
  *
  * <p>Black-Box testing should: </p>
  *
  * <ol>
- *   <li>The test class should be annotated with {@link ExtendWith} and {@link Fixtures}.class as value.
- *   <li>The test class should be annotated with {@link WithFixture} annotation(s) and some implementation classes
- *       as value.
+ *   <li>The test class should be annotated with {@link ExtendWith} and {@link Fixtures}.
+ *   class as value.
+ *   <li>The test class should be annotated with {@link WithFixture} annotation(s) and some
+ *   implementation classes as value.
  *   <li>each test should be annotated with {@link TestTemplate} annotataion.
  *   <li>each test should have some parameters (probably with interfaces type) which will be
  *       accessed during the test.
  * </ol>
  *
- * e.g:<br/>
+ * <p>e.g:</p>
  *<pre>{@code
  * @ExtendWith(Fixtures.class)
  * @WithFixture(SlowServiceFixture.class)
@@ -50,12 +50,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * assertTrue(palindromeService.palindrome(echoService.echo("CABAC")));
  * assertFalse(palindromeService.palindrome(echoService.echo("TEST")));
  * }
- * }</pre>
+ * }}</pre>
  */
 public interface Fixture {
 
   /** Set up the environment access. May throw a runtime exception if something went wrong. */
   void setUp();
+
   /**
    * Create an access object to a component in the environment. An implementor should return null if
    * the requested object is invalid or not relevant to this type of an environment. An implementor
@@ -67,6 +68,7 @@ public interface Fixture {
    * @return an access object, nu
    */
   <T> T proxyFor(Class<? extends T> clasz);
+
   /**
    * Tear down the environment, close all resources needed in this fixture.
    *
