@@ -45,7 +45,8 @@ public class DockerfileFixture implements Fixture {
                     .append(" else echo false;")
                     .append("fi");
 
-            ExecResult execResult = genericContainer.execInContainer("/bin/bash","-c", cmd.toString());
+            ExecResult execResult =
+                genericContainer.execInContainer("/bin/bash", "-c", cmd.toString());
             return Boolean.valueOf(execResult.getStdout().trim());
           } catch (UnsupportedOperationException
               | IOException

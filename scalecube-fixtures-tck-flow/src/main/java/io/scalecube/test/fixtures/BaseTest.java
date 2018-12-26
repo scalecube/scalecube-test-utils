@@ -33,6 +33,7 @@ public class BaseTest {
     System.out.println("------ test 1 service -----");
     assertEquals("TEST", echoService.echo("TEST"));
   }
+
   /**
    * basic test.
    *
