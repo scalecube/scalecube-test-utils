@@ -13,4 +13,9 @@ public class FixtureInvocationContext implements TestTemplateInvocationContext {
   public Fixture getFixture() {
     return this.fixture;
   }
+
+  @Override
+  public String getDisplayName(int invocationIndex) {
+    return this.fixture.getClass().getSimpleName();
+  }
 }
