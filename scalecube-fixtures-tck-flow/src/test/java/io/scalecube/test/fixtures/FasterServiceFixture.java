@@ -11,11 +11,11 @@ public class FasterServiceFixture implements Fixture {
     palindromeService =
         s -> {
           int length = s.length();
-          int i, begin, end, middle;
-          begin = 0;
-          end = length - 1;
-          middle = (begin + end) / 2;
+          int begin = 0;
+          int end = length - 1;
+          int middle = (begin + end) / 2;
 
+          int i;
           for (i = begin; i <= middle; i++) {
             if (s.charAt(begin) == s.charAt(end)) {
               begin++;
