@@ -18,8 +18,9 @@ public class BaseTest {
   @TestTemplate
   public void test(EchoService echoService, PalindromeService palindromeService) {
     System.out.println("------ test 2 services -----");
-    assertTrue(palindromeService.palindrome(echoService.echo("CABAC")));
+    assertTrue(palindromeService.palindrome(echoService.echo("MADAM")));
     assertFalse(palindromeService.palindrome(echoService.echo("TEST")));
+    assertTrue(palindromeService.palindrome(echoService.echo("level")));
   }
 
   /**
@@ -31,5 +32,15 @@ public class BaseTest {
   public void test2(EchoService echoService) {
     System.out.println("------ test 1 service -----");
     assertEquals("TEST", echoService.echo("TEST"));
+  }
+  /**
+   * basic test.
+   *
+   * @param echoService an implementation of the {@link EchoService}
+   */
+  @TestTemplate
+  public void testAgain(EchoService echoService) {
+    System.out.println("------ test 1 service -----");
+    assertEquals("test", echoService.echo("test"));
   }
 }
