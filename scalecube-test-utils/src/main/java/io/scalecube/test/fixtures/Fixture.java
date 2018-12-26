@@ -6,24 +6,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * A Fixture is an abstraction of a test environment. Some implementations would create the
- * environment itself, some may create some mocks, and others can just create client to access
- * a real running environment.
- * The test should not care how the environment looks like.
+ * environment itself, some may create some mocks, and others can just create client to access a
+ * real running environment. The test should not care how the environment looks like.
  *
- * <p>Black-Box testing should: </p>
+ * <p>Black-Box testing should:
  *
  * <ol>
- *   <li>The test class should be annotated with {@link ExtendWith} and {@link Fixtures}.
- *   class as value.
+ *   <li>The test class should be annotated with {@link ExtendWith} and {@link Fixtures}. class as
+ *       value.
  *   <li>The test class should be annotated with {@link WithFixture} annotation(s) and some
- *   implementation classes as value.
+ *       implementation classes as value.
  *   <li>each test should be annotated with {@link TestTemplate} annotataion.
  *   <li>each test should have some parameters (probably with interfaces type) which will be
  *       accessed during the test.
  * </ol>
  *
- * <p>e.g:</p>
- *<pre>{@code
+ * <p>e.g:
+ *
+ * <pre>{@code
  * @ExtendWith(Fixtures.class)
  * @WithFixture(SlowServiceFixture.class)
  * @WithFixture(FasterServiceFixture.class)
@@ -50,7 +50,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * assertTrue(palindromeService.palindrome(echoService.echo("CABAC")));
  * assertFalse(palindromeService.palindrome(echoService.echo("TEST")));
  * }
- * }}</pre>
+ * }
+ * }</pre>
  */
 public interface Fixture {
 
@@ -75,4 +76,8 @@ public interface Fixture {
    * <p>An implementor should not throw exceptions during teardown process.
    */
   void tearDown();
+
+  default String name() {
+    return getClass().getSimpleName();
+  }
 }
