@@ -1,0 +1,2 @@
+# scalecube-test-utils
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/beb3b5407eaa4798b0016e0e5eecb0c4)](https://app.codacy.com/app/ScaleCube/scalecube-test-utils?utm_source=github.com&utm_medium=referral&utm_content=scalecube/scalecube-test-utils&utm_campaign=Badge_Grade_Settings)
