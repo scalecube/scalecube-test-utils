@@ -1,15 +1,25 @@
 package io.scalecube.test.fixtures;
 
+import java.util.concurrent.TimeUnit;
+
 public class SlowServiceFixture implements Fixture {
 
-  EchoService echoService;
-  PalindromeService palindromeService;
+  private EchoService echoService;
+  private PalindromeService palindromeService;
 
   @Override
   public void setUp() {
-    echoService = new EchoServiceImpl(100);
-    this.palindromeService = s -> new StringBuilder(s).reverse().toString().equals(s);
+    echoService = s -> new StringBuilder(sleep(s)).toString();
+    palindromeService = s -> new StringBuilder(sleep(s)).reverse().toString().equals(sleep(s));
     System.out.println("service.init");
+  }
+
+  private static String sleep(String s) {
+    try {
+      TimeUnit.MILLISECONDS.sleep(2 * s.length());
+    } catch (InterruptedException ignoredException) {
+    }
+    return s;
   }
 
   @Override

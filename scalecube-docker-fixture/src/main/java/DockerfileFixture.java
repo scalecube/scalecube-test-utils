@@ -10,7 +10,7 @@ public class DockerfileFixture implements Fixture {
 
   private EchoService echoService;
   private PalindromeService palindromeService;
-  GenericContainer genericContainer;
+  private GenericContainer genericContainer;
 
   @Override
   public void setUp() {

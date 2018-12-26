@@ -2,13 +2,30 @@ package io.scalecube.test.fixtures;
 
 public class FasterServiceFixture implements Fixture {
 
-  EchoService echoService;
-  PalindromeService palindromeService;
+  private EchoService echoService;
+  private PalindromeService palindromeService;
 
   @Override
   public void setUp() {
-    echoService = new EchoServiceImpl(30);
-    this.palindromeService = s -> new StringBuilder(s).reverse().toString().equals(s);
+    echoService = s -> s;
+    palindromeService =
+        s -> {
+          int length = s.length();
+          int i, begin, end, middle;
+          begin = 0;
+          end = length - 1;
+          middle = (begin + end) / 2;
+
+          for (i = begin; i <= middle; i++) {
+            if (s.charAt(begin) == s.charAt(end)) {
+              begin++;
+              end--;
+            } else {
+              break;
+            }
+          }
+          return (i == middle + 1);
+        };
     System.out.println("faster service.init");
   }
 
