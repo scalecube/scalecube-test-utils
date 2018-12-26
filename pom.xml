@@ -21,5 +21,7 @@
   <modules>
     <module>scalecube-test-utils</module>
     <module>scalecube-microservices-fixture</module>
+    <module>scalecube-docker-fixture</module>
+    <module>scalecube-fixtures-tck-flow</module>
   </modules>
 </project>
