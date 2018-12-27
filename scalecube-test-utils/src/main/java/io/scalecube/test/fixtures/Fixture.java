@@ -3,6 +3,7 @@ package io.scalecube.test.fixtures;
 import java.lang.reflect.Proxy;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.opentest4j.TestAbortedException;
 
 /**
  * A Fixture is an abstraction of a test environment. Some implementations would create the
@@ -55,8 +56,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
  */
 public interface Fixture {
 
-  /** Set up the environment access. May throw a runtime exception if something went wrong. */
-  void setUp();
+  /**
+   * Set up the environment access. May throw a {@link TestAbortedException} if something went
+   * wrong.
+   */
+  void setUp() throws TestAbortedException;
 
   /**
    * Create an access object to a component in the environment. An implementor should return null if

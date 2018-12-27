@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
 import org.junit.platform.commons.util.AnnotationUtils;
+import org.opentest4j.TestAbortedException;
 
 /**
  * The main {@link Extension} of {@link Fixture}s. 
@@ -73,11 +74,13 @@ public class Fixtures
                           f = FixtureFactory.getFixture(fixtureClass);
                           f.setUp();
                           return f;
-                        } catch (FixtureCreationException ignoredException) {
-                          new ExtensionConfigurationException(
-                                  "unable to setup fixture", ignoredException)
-                              .printStackTrace();
-                          return null;
+                        } catch (FixtureCreationException fixtureCreationException) {
+                          throw new TestAbortedException(
+                              "unable to setup fixture",
+                              new ExtensionConfigurationException(
+                                  "unable to setup fixture", fixtureCreationException));
+                        } catch (TestAbortedException abortedException) {
+                          throw abortedException;
                         }
                       });
               if (fixture != null) {
