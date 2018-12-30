@@ -6,12 +6,23 @@
     <artifactId>scalecube-test-utils-parent</artifactId>
     <version>0.0.3-SNAPSHOT</version>
   </parent>
-  <artifactId>scalecube-test-utils</artifactId>
+  <artifactId>scalecube-docker-fixture</artifactId>
+
   <properties>
-    <junit-jupiter.version>5.3.2</junit-jupiter.version>
+    <enforcer.skip>true</enforcer.skip>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>io.scalecube</groupId>
+      <artifactId>scalecube-test-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>1.10.1</version>
+    </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
@@ -22,5 +33,20 @@
       <artifactId>junit-jupiter-engine</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>io.scalecube</groupId>
+      <artifactId>scalecube-fixtures-tck-flow</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -1,15 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>io.scalecube</groupId>
   <artifactId>scalecube-test-utils-parent</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.3-SNAPSHOT</version>
   <name>Scalecube utilities for unit and integration tesing</name>
 
   <parent>
     <groupId>io.scalecube</groupId>
     <artifactId>scalecube-parent-pom</artifactId>
-    <version>0.0.16</version>
+    <version>0.0.17</version>
   </parent>
   <packaging>pom</packaging>
   <scm>
@@ -21,5 +20,7 @@
 
   <modules>
     <module>scalecube-test-utils</module>
+    <module>scalecube-docker-fixture</module>
+    <module>scalecube-fixtures-tck-flow</module>
   </modules>
 </project>
