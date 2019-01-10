@@ -1,49 +1,115 @@
 package io.scalecube.test.fixtures;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.ExtensionConfigurationException;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
+import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
+import org.junit.platform.commons.util.AnnotationUtils;
+import org.opentest4j.TestAbortedException;
 
-public class Fixtures implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
+/**
+ * The main {@link Extension} of {@link Fixture}s. 
+ */
+public class Fixtures
+    implements AfterAllCallback, TestTemplateInvocationContextProvider, ParameterResolver {
+
+  private static Namespace namespace = Namespace.create(Fixtures.class);
+
+  private final Map<Class<? extends Fixture>, Fixture> initializedFixtures = new HashMap<>();
 
   private static final Function<? super Store, ? extends Fixture> getFixtureFromStore =
       store -> store.get("Fixture", Fixture.class);
 
+  private static Optional<Store> getStore(ExtensionContext context) {
+    return Optional.of(namespace).map(context::getStore);
+  }
+
   @Override
   public void afterAll(ExtensionContext context) throws Exception {
-    getStore(context).map(getFixtureFromStore).ifPresent(Fixture::tearDown);
+    initializedFixtures
+        .entrySet()
+        .removeIf(
+            entry -> {
+              entry.getValue().tearDown();
+              return true;
+            });
   }
 
   @Override
-  public void beforeAll(ExtensionContext context) throws FixtureCreationException {
-    Class<?> requiredTestClass = context.getRequiredTestClass();
-    Optional<Class<? extends Fixture>> fixtureClass =
-        Optional.ofNullable(requiredTestClass)
-            .filter(clz -> clz.isAnnotationPresent(WithFixture.class))
-            .map(clz -> clz.getAnnotation(WithFixture.class))
-            .map(WithFixture::value);
+  public boolean supportsTestTemplate(ExtensionContext context) {
+    List<WithFixture> fixtures =
+        AnnotationUtils.findRepeatableAnnotations(
+            context.getRequiredTestClass(), WithFixture.class);
+    return !fixtures.isEmpty();
+  }
 
-    if (fixtureClass.isPresent()) {
-      Fixture fixture = FixtureFactory.getFixture(fixtureClass.get());
-      getStore(context).ifPresent(store -> store.put("Fixture", fixture));
+  @Override
+  public Stream<TestTemplateInvocationContext> provideTestTemplateInvocationContexts(
+      ExtensionContext context) {
+    return AnnotationUtils.findRepeatableAnnotations(
+            context.getRequiredTestClass(), WithFixture.class)
+        .stream()
+        .map(WithFixture::value)
+        .flatMap(
+            fixtureClass -> {
+              Fixture fixture =
+                  initializedFixtures.computeIfAbsent(
+                      fixtureClass,
+                      clz -> {
+                        Fixture f;
+                        try {
+                          f = FixtureFactory.getFixture(fixtureClass);
+                          f.setUp();
+                          return f;
+                        } catch (FixtureCreationException fixtureCreationException) {
+                          throw new TestAbortedException(
+                              "unable to setup fixture",
+                              new ExtensionConfigurationException(
+                                  "unable to setup fixture", fixtureCreationException));
+                        } catch (TestAbortedException abortedException) {
+                          throw abortedException;
+                        }
+                      });
+              if (fixture != null) {
+                getStore(context).ifPresent(store -> store.put("Fixture", fixture));
+                return Stream.of(fixture);
+              } else {
+                return Stream.empty();
+              }
+            })
+        .map(FixtureInvocationContext::new);
+  }
+
+  @Override
+  public boolean supportsParameter(
+      ParameterContext parameterContext, ExtensionContext extensionContext)
+      throws ParameterResolutionException {
+    return true;
+    // parameterContext.getParameter().getType().isAssignableFrom(Fixture.class);
+  }
+
+  @Override
+  public Object resolveParameter(
+      ParameterContext parameterContext, ExtensionContext extensionContext)
+      throws ParameterResolutionException {
+    Optional<? extends Fixture> fixture = getStore(extensionContext).map(getFixtureFromStore);
+    Class<?> paramType = parameterContext.getParameter().getType();
+    if (paramType.isAssignableFrom(Fixture.class)) {
+      return fixture.orElse(null);
     }
-  }
-
-  @Override
-  public void beforeEach(ExtensionContext context) throws Exception {
-    context
-        .getTestInstance()
-        .filter(FixtureAwareTest.class::isInstance)
-        .map(FixtureAwareTest.class::cast)
-        .ifPresent(test -> test.fixture(getStore(context).map(getFixtureFromStore).get()));
-  }
-
-  private static Optional<Store> getStore(ExtensionContext context) {
-    return Optional.of(Namespace.GLOBAL).map(context::getStore);
+    return fixture.map(f -> f.proxyFor(paramType)).orElse(null);
   }
 }
