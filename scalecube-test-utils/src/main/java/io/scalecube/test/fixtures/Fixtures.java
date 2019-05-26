@@ -110,7 +110,11 @@ public class Fixtures
   public boolean supportsParameter(
       ParameterContext parameterContext, ExtensionContext extensionContext)
       throws ParameterResolutionException {
-    return getStore(extensionContext).map(getFixtureFromStore).isPresent();
+    Class<?> type = parameterContext.getParameter().getType();
+    return getStore(extensionContext)
+        .map(getFixtureFromStore)
+        .map(fixture -> fixture.unsupportedClasses().stream().noneMatch(type::equals))
+        .orElse(false);
   }
 
   @Override

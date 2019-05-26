@@ -1,6 +1,12 @@
 package io.scalecube.test.fixtures;
 
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.jupiter.api.RepetitionInfo;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.opentest4j.TestAbortedException;
@@ -83,5 +89,9 @@ public interface Fixture {
 
   default String name() {
     return getClass().getSimpleName();
+  }
+
+  default Collection<Class<?>> unsupportedClasses() {
+    return Arrays.asList(RepetitionInfo.class, TestInfo.class, TestReporter.class);
   }
 }
