@@ -111,10 +111,15 @@ public class Fixtures
       ParameterContext parameterContext, ExtensionContext extensionContext)
       throws ParameterResolutionException {
     Class<?> type = parameterContext.getParameter().getType();
+        if (type
+        .getPackage()
+        .getName()
+        .startsWith("org.junit.jupiter.api")) {
+      return false;
+    }
     return getStore(extensionContext)
         .map(getFixtureFromStore)
-        .map(fixture -> fixture.unsupportedClasses().stream().noneMatch(type::equals))
-        .orElse(false);
+        .isPresent();
   }
 
   @Override

@@ -90,8 +90,4 @@ public interface Fixture {
   default String name() {
     return getClass().getSimpleName();
   }
-
-  default Collection<Class<?>> unsupportedClasses() {
-    return Arrays.asList(RepetitionInfo.class, TestInfo.class, TestReporter.class);
-  }
 }
