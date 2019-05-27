@@ -1,11 +1,16 @@
 package io.scalecube.test.fixtures;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.RepetitionInfo;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.AfterAllCallback;
@@ -21,6 +26,7 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
 import org.junit.platform.commons.util.AnnotationUtils;
+import org.junit.platform.commons.util.Preconditions;
 import org.opentest4j.TestAbortedException;
 
 /**
@@ -98,12 +104,35 @@ public class Fixtures
                       getStore(ctx).ifPresent(store -> store.put(FIXTURE_LIFECYCLE, lifecycle));
                       getStore(ctx).ifPresent(store -> store.put(FIXTURE, fixture));
                     });
-                return Stream.of(fixture);
+                Optional<RepeatedTest> repeatedTest =
+                    AnnotationUtils.findAnnotation(
+                        context.getRequiredTestMethod(), RepeatedTest.class);
+                if (repeatedTest.isPresent()) {
+                  int totalRepetitions =
+                      totalRepetitions(repeatedTest.get(), context.getRequiredTestMethod());
+                  return IntStream.rangeClosed(1, totalRepetitions)
+                      .mapToObj(
+                          repetition ->
+                              new RepeatedFixtureInvocationContext(
+                                  fixture, repetition, totalRepetitions));
+                } else {
+                  return Stream.of(fixture).map(FixtureInvocationContext::new);
+                }
               } else {
                 return Stream.empty();
               }
-            })
-        .map(FixtureInvocationContext::new);
+            });
+  }
+
+  private static int totalRepetitions(RepeatedTest repeatedTest, Method method) {
+    int repetitions = repeatedTest.value();
+    Preconditions.condition(
+        repetitions > 0,
+        () ->
+            String.format(
+                "Configuration error: @RepeatedTest on method [%s] must be declared with a positive 'value'.",
+                method));
+    return repetitions;
   }
 
   @Override
@@ -111,8 +140,11 @@ public class Fixtures
       ParameterContext parameterContext, ExtensionContext extensionContext)
       throws ParameterResolutionException {
     Class<?> type = parameterContext.getParameter().getType();
-    if (type.getPackage().getName().startsWith("org.junit.jupiter.api")) {
+    if (type.isAssignableFrom(TestInfo.class)) {
       return false;
+    }
+    if (type.isAssignableFrom(RepetitionInfo.class)) {
+      return true;
     }
     return getStore(extensionContext).map(getFixtureFromStore).isPresent();
   }
