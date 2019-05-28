@@ -126,20 +126,30 @@ public class Fixtures
     return fixture.map(f -> f.proxyFor(paramType)).orElse(null);
   }
 
-  private static Function<? super Class<? extends Fixture>, ? extends Fixture> setUp(
+  private Function<? super Class<? extends Fixture>, ? extends Fixture> setUp(
       Class<? extends Fixture> fixtureClass) {
     return clz -> {
       Fixture f;
       try {
         f = FixtureFactory.getFixture(fixtureClass);
-        f.setUp();
-        return f;
       } catch (FixtureCreationException fixtureCreationException) {
         throw new TestAbortedException(
             "unable to setup fixture",
             new ExtensionConfigurationException(
                 "unable to setup fixture", fixtureCreationException));
       } catch (TestAbortedException abortedException) {
+        throw abortedException;
+      }
+
+      try {
+        f.setUp();
+        return f;
+      } catch (TestAbortedException abortedException) {
+        try {
+          f.tearDown();
+        } catch (Exception supressed) {
+          abortedException.addSuppressed(supressed);
+        }
         throw abortedException;
       }
     };
