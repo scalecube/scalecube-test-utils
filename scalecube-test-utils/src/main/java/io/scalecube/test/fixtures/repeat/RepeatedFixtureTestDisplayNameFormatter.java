@@ -32,12 +32,18 @@ public class RepeatedFixtureTestDisplayNameFormatter {
     this.displayName = displayName;
     this.fixtureName = fixtureName;
   }
-
-  public String format(int currentRepetition, int totalRepetitions) {
+  
+  /**
+   * Format the {@link DisplayName} with the {@link RepeatInfo}.
+   *
+   * @param info the {@link RepeatInfo}
+   * @return the DisplayName formatted.
+   */
+  public String format(RepeatInfo info) {
     return this.pattern //
         .replace(FIXTURE_NAME_PLACEHOLDER, this.fixtureName)
         .replace(DISPLAY_NAME_PLACEHOLDER, this.displayName) //
-        .replace(CURRENT_REPETITION_PLACEHOLDER, String.valueOf(currentRepetition)) //
-        .replace(TOTAL_REPETITIONS_PLACEHOLDER, String.valueOf(totalRepetitions));
+        .replace(CURRENT_REPETITION_PLACEHOLDER, String.valueOf(info.getCurrentRepetition())) //
+        .replace(TOTAL_REPETITIONS_PLACEHOLDER, String.valueOf(info.getTotalRepetitions()));
   }
 }

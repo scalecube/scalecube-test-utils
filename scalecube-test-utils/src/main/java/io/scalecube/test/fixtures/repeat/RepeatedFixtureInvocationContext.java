@@ -34,7 +34,7 @@ public class RepeatedFixtureInvocationContext implements TestTemplateInvocationC
 
   @Override
   public String getDisplayName(int invocationIndex) {
-    return this.formatter.format(this.currentRepetition, this.totalRepetitions);
+    return this.formatter.format(this);
   }
 
   @Override
