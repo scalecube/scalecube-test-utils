@@ -33,7 +33,7 @@ public class RepeatedFixtureTestDisplayNameFormatter {
     this.fixtureName = fixtureName;
   }
 
-  String format(int currentRepetition, int totalRepetitions) {
+  public String format(int currentRepetition, int totalRepetitions) {
     return this.pattern //
         .replace(FIXTURE_NAME_PLACEHOLDER, this.fixtureName)
         .replace(DISPLAY_NAME_PLACEHOLDER, this.displayName) //
