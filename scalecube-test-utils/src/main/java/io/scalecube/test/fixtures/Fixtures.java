@@ -129,7 +129,7 @@ public class Fixtures
                       .mapToObj(
                           repetition ->
                               new RepeatedFixtureInvocationContext(
-                                  repeat, fixture, repetition, totalRepetitions, formatter))
+                                  fixture, repetition, totalRepetitions, formatter))
                       .peek(
                           repeatedContext ->
                               getStore(context)

@@ -12,15 +12,12 @@ public class RepeatedFixtureInvocationContext implements TestTemplateInvocationC
 
   /**
    * Create a new RepeatedFixtureInvocationContext.
-   *
-   * @param repeat the {@link Repeat} annotation of the test
    * @param fixture the current fixture to run on
    * @param currentRepetition the current index of the repetition
    * @param totalRepetitions the total repetitions to do.
    * @param formatter display name formatter for a {@link Repeat @Repeat}.
    */
   public RepeatedFixtureInvocationContext(
-      Repeat repeat,
       Fixture fixture,
       int currentRepetition,
       int totalRepetitions,
