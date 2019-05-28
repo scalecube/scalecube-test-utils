@@ -12,8 +12,8 @@ import org.junit.jupiter.api.TestTemplate;
 public class BaseTest {
 
   @BeforeEach
-  void setUp(TestInfo testInfo) {
-    System.out.println(testInfo.getDisplayName() + " started");
+  public void setUp(TestInfo testInfo) {
+    System.out.println("︵‿︵‿︵‿︵‿︵ " + testInfo.getDisplayName() + " started ‿︵‿︵‿︵‿︵‿︵‿︵");
   }
 
   /**
