@@ -114,11 +114,6 @@ public class Fixtures
                 if (repeatedTest.isPresent()) {
                   Repeat repeat = repeatedTest.get();
                   int totalRepetitions = totalRepetitions(repeat, context.getRequiredTestMethod());
-                  //                  String pattern =
-                  // Preconditions.notBlank(repeatedTest.get().name().trim(), () -> String.format(
-                  //                      "Configuration error: @RepeatedTest on method [%s] must be
-                  // declared with a non-empty name.", method));
-
                   RepeatedFixtureTestDisplayNameFormatter formatter =
                       displayNameFormatter(
                           repeat,
