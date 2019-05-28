@@ -1,11 +1,13 @@
 package io.scalecube.test.fixtures;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import io.scalecube.test.fixtures.repeat.Repeat;
+import io.scalecube.test.fixtures.repeat.RepetitionInfo;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(Fixtures.class)
@@ -13,12 +15,36 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @WithFixture(value = SlowServiceFixture.class, lifecycle = Lifecycle.PER_METHOD)
 public class SimpleInMemoryTest extends BaseTest {
 
-  @RepeatedTest(2)
+  @Repeat(4)
   @TestTemplate
-  @DisplayName("Welcome ")
-  public void test3(EchoService echoService) {
+  @DisplayName("Welcome")
+  public void test3(EchoService echoService, RepetitionInfo info) {
     assertNotNull(echoService);
-    System.out.println("+++++++++++ ECHO IS " + echoService.toString());
-    super.test2(echoService);
+    System.out.println(
+        "+++++++++++ in exeution "
+            + info.getCurrentRepetition()
+            + " of "
+            + info.getTotalRepetitions()
+            + " ECHO IS "
+            + echoService.toString());
+  }
+
+  @Repeat(3)
+  @TestTemplate
+  @DisplayName("REPEATED 3 TIMES")
+  public void testRepated(RepetitionInfo info) {
+    assertNotNull(info);
+    System.out.println(
+        "@@@ Exeution "
+            + info.getCurrentRepetition()
+            + " of "
+            + info.getTotalRepetitions()
+            + " @@@");
+  }
+
+  @TestTemplate
+  @DisplayName("NOT REPEATED")
+  public void testNotRepated(RepetitionInfo info) {
+    assertEquals(null, info);
   }
 }

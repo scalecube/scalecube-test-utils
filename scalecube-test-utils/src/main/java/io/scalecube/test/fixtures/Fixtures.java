@@ -1,5 +1,9 @@
 package io.scalecube.test.fixtures;
 
+import io.scalecube.test.fixtures.repeat.RepeatedFixtureInvocationContext;
+import io.scalecube.test.fixtures.repeat.RepeatedTestDisplayNameFormatter;
+import io.scalecube.test.fixtures.repeat.Repeat;
+import io.scalecube.test.fixtures.repeat.RepetitionInfo;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +13,6 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -43,6 +46,7 @@ public class Fixtures
   private static final String FIXTURE = "Fixture";
   private static final String FIXTURE_LIFECYCLE = "FixtureLifecycle";
   private static final String FIXTURE_CLASS = "FixtureClass";
+  private static final String REPETITION_INFO = "RepetitionInfo";
 
   private static Namespace namespace = Namespace.create(Fixtures.class);
 
@@ -74,6 +78,7 @@ public class Fixtures
 
   @Override
   public boolean supportsTestTemplate(ExtensionContext context) {
+
     List<WithFixture> fixtures =
         AnnotationUtils.findRepeatableAnnotations(
             context.getRequiredTestClass(), WithFixture.class);
@@ -83,6 +88,7 @@ public class Fixtures
   @Override
   public Stream<TestTemplateInvocationContext> provideTestTemplateInvocationContexts(
       ExtensionContext context) {
+
     return AnnotationUtils.findRepeatableAnnotations(
             context.getRequiredTestClass(), WithFixture.class)
         .stream()
@@ -104,17 +110,31 @@ public class Fixtures
                       getStore(ctx).ifPresent(store -> store.put(FIXTURE_LIFECYCLE, lifecycle));
                       getStore(ctx).ifPresent(store -> store.put(FIXTURE, fixture));
                     });
-                Optional<RepeatedTest> repeatedTest =
-                    AnnotationUtils.findAnnotation(
-                        context.getRequiredTestMethod(), RepeatedTest.class);
+                Optional<Repeat> repeatedTest =
+                    AnnotationUtils.findAnnotation(context.getRequiredTestMethod(), Repeat.class);
                 if (repeatedTest.isPresent()) {
-                  int totalRepetitions =
-                      totalRepetitions(repeatedTest.get(), context.getRequiredTestMethod());
+                  Repeat repeat = repeatedTest.get();
+                  int totalRepetitions = totalRepetitions(repeat, context.getRequiredTestMethod());
+                  //                  String pattern =
+                  // Preconditions.notBlank(repeatedTest.get().name().trim(), () -> String.format(
+                  //                      "Configuration error: @RepeatedTest on method [%s] must be
+                  // declared with a non-empty name.", method));
+
+                  RepeatedTestDisplayNameFormatter formatter =
+                      displayNameFormatter(
+                          repeat,
+                          context.getRequiredTestMethod(),
+                          context.getDisplayName(),
+                          fixture.name());
                   return IntStream.rangeClosed(1, totalRepetitions)
                       .mapToObj(
                           repetition ->
                               new RepeatedFixtureInvocationContext(
-                                  fixture, repetition, totalRepetitions));
+                                  repeat, fixture, repetition, totalRepetitions, formatter))
+                      .peek(
+                          repeatedContext ->
+                              getStore(context)
+                                  .ifPresent(store -> store.put(REPETITION_INFO, repeatedContext)));
                 } else {
                   return Stream.of(fixture).map(FixtureInvocationContext::new);
                 }
@@ -124,13 +144,25 @@ public class Fixtures
             });
   }
 
-  private static int totalRepetitions(RepeatedTest repeatedTest, Method method) {
+  private static RepeatedTestDisplayNameFormatter displayNameFormatter(
+      Repeat repeatedTest, Method method, String displayName, String fixtureName) {
+    String pattern =
+        Preconditions.notBlank(
+            repeatedTest.name().trim(),
+            () ->
+                String.format(
+                    "Configuration error: @RepeatedTest on method [%s] must be declared with a non-empty name.",
+                    method));
+    return new RepeatedTestDisplayNameFormatter(pattern, displayName, fixtureName);
+  }
+
+  private static int totalRepetitions(Repeat repeatedTest, Method method) {
     int repetitions = repeatedTest.value();
     Preconditions.condition(
         repetitions > 0,
         () ->
             String.format(
-                "Configuration error: @RepeatedTest on method [%s] must be declared with a positive 'value'.",
+                "Configuration error: @Repeat on method [%s] must be declared with a positive 'value'.",
                 method));
     return repetitions;
   }
@@ -153,17 +185,22 @@ public class Fixtures
   public Object resolveParameter(
       ParameterContext parameterContext, ExtensionContext extensionContext)
       throws ParameterResolutionException {
-    Optional<? extends Fixture> fixture = getStore(extensionContext).map(getFixtureFromStore);
+
     Class<?> paramType = parameterContext.getParameter().getType();
+    if (paramType.isAssignableFrom(RepetitionInfo.class)) {
+      return getStore(extensionContext)
+          .map(store -> store.get(REPETITION_INFO, RepetitionInfo.class))
+          .orElse(null);
+    }
+    Optional<? extends Fixture> fixture = getStore(extensionContext).map(getFixtureFromStore);
     return fixture.map(f -> f.proxyFor(paramType)).orElse(null);
   }
 
   private static Function<? super Class<? extends Fixture>, ? extends Fixture> setUp(
       Class<? extends Fixture> fixtureClass) {
     return clz -> {
-      Fixture f;
       try {
-        f = FixtureFactory.getFixture(fixtureClass);
+        Fixture f = FixtureFactory.getFixture(fixtureClass);
         f.setUp();
         return f;
       } catch (FixtureCreationException fixtureCreationException) {
