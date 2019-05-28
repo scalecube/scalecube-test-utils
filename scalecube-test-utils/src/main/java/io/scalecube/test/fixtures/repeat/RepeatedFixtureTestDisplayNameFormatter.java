@@ -1,19 +1,11 @@
 package io.scalecube.test.fixtures.repeat;
-/*
- * Copyright 2015-2019 the original author or authors.
- *
- * All rights reserved. This program and the accompanying materials are
- * made available under the terms of the Eclipse Public License v2.0 which
- * accompanies this distribution and is available at
- *
- * http://www.eclipse.org/legal/epl-v20.html
- */
 
 import static io.scalecube.test.fixtures.repeat.Repeat.CURRENT_REPETITION_PLACEHOLDER;
 import static io.scalecube.test.fixtures.repeat.Repeat.DISPLAY_NAME_PLACEHOLDER;
 import static io.scalecube.test.fixtures.repeat.Repeat.FIXTURE_NAME_PLACEHOLDER;
 import static io.scalecube.test.fixtures.repeat.Repeat.TOTAL_REPETITIONS_PLACEHOLDER;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 
 /**
@@ -21,13 +13,21 @@ import org.junit.jupiter.api.RepeatedTest;
  *
  * @since 5.0
  */
-public class RepeatedTestDisplayNameFormatter {
+public class RepeatedFixtureTestDisplayNameFormatter {
 
   private final String pattern;
   private final String displayName;
   private final String fixtureName;
 
-  public RepeatedTestDisplayNameFormatter(String pattern, String displayName, String fixtureName) {
+  /**
+   * Create a formatter for fixture and repeat info.
+   *
+   * @param pattern the pattern in {@link Repeat#name()}
+   * @param displayName the {@link DisplayName}
+   * @param fixtureName the name of the fixture running in this iteration.
+   */
+  public RepeatedFixtureTestDisplayNameFormatter(
+      String pattern, String displayName, String fixtureName) {
     this.pattern = pattern;
     this.displayName = displayName;
     this.fixtureName = fixtureName;

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.scalecube.test.fixtures.repeat.Repeat;
-import io.scalecube.test.fixtures.repeat.RepetitionInfo;
+import io.scalecube.test.fixtures.repeat.RepeatInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestTemplate;
@@ -18,7 +18,7 @@ public class SimpleInMemoryTest extends BaseTest {
   @Repeat(4)
   @TestTemplate
   @DisplayName("Welcome")
-  public void test3(EchoService echoService, RepetitionInfo info) {
+  public void test3(EchoService echoService, RepeatInfo info) {
     assertNotNull(echoService);
     System.out.println(
         "+++++++++++ in exeution "
@@ -32,7 +32,7 @@ public class SimpleInMemoryTest extends BaseTest {
   @Repeat(3)
   @TestTemplate
   @DisplayName("REPEATED 3 TIMES")
-  public void testRepated(RepetitionInfo info) {
+  public void testRepated(RepeatInfo info) {
     assertNotNull(info);
     System.out.println(
         "@@@ Exeution "
@@ -44,7 +44,7 @@ public class SimpleInMemoryTest extends BaseTest {
 
   @TestTemplate
   @DisplayName("NOT REPEATED")
-  public void testNotRepated(RepetitionInfo info) {
+  public void testNotRepated(RepeatInfo info) {
     assertEquals(null, info);
   }
 }

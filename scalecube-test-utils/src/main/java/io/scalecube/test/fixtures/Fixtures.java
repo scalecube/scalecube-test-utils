@@ -1,9 +1,9 @@
 package io.scalecube.test.fixtures;
 
-import io.scalecube.test.fixtures.repeat.RepeatedFixtureInvocationContext;
-import io.scalecube.test.fixtures.repeat.RepeatedTestDisplayNameFormatter;
 import io.scalecube.test.fixtures.repeat.Repeat;
-import io.scalecube.test.fixtures.repeat.RepetitionInfo;
+import io.scalecube.test.fixtures.repeat.RepeatInfo;
+import io.scalecube.test.fixtures.repeat.RepeatedFixtureInvocationContext;
+import io.scalecube.test.fixtures.repeat.RepeatedFixtureTestDisplayNameFormatter;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -46,7 +45,7 @@ public class Fixtures
   private static final String FIXTURE = "Fixture";
   private static final String FIXTURE_LIFECYCLE = "FixtureLifecycle";
   private static final String FIXTURE_CLASS = "FixtureClass";
-  private static final String REPETITION_INFO = "RepetitionInfo";
+  private static final String REPETITION_INFO = "RepeatInfo";
 
   private static Namespace namespace = Namespace.create(Fixtures.class);
 
@@ -120,7 +119,7 @@ public class Fixtures
                   //                      "Configuration error: @RepeatedTest on method [%s] must be
                   // declared with a non-empty name.", method));
 
-                  RepeatedTestDisplayNameFormatter formatter =
+                  RepeatedFixtureTestDisplayNameFormatter formatter =
                       displayNameFormatter(
                           repeat,
                           context.getRequiredTestMethod(),
@@ -144,16 +143,18 @@ public class Fixtures
             });
   }
 
-  private static RepeatedTestDisplayNameFormatter displayNameFormatter(
+  private static RepeatedFixtureTestDisplayNameFormatter displayNameFormatter(
       Repeat repeatedTest, Method method, String displayName, String fixtureName) {
     String pattern =
         Preconditions.notBlank(
             repeatedTest.name().trim(),
             () ->
                 String.format(
-                    "Configuration error: @RepeatedTest on method [%s] must be declared with a non-empty name.",
+                    "Configuration error: "
+                        + "@Repeat on method [%s] must be declared with"
+                        + " a non-empty name.",
                     method));
-    return new RepeatedTestDisplayNameFormatter(pattern, displayName, fixtureName);
+    return new RepeatedFixtureTestDisplayNameFormatter(pattern, displayName, fixtureName);
   }
 
   private static int totalRepetitions(Repeat repeatedTest, Method method) {
@@ -162,7 +163,9 @@ public class Fixtures
         repetitions > 0,
         () ->
             String.format(
-                "Configuration error: @Repeat on method [%s] must be declared with a positive 'value'.",
+                "Configuration error: "
+                    + "@Repeat on method [%s] must be declared with"
+                    + " a positive 'value'.",
                 method));
     return repetitions;
   }
@@ -175,7 +178,7 @@ public class Fixtures
     if (type.isAssignableFrom(TestInfo.class)) {
       return false;
     }
-    if (type.isAssignableFrom(RepetitionInfo.class)) {
+    if (type.isAssignableFrom(RepeatInfo.class)) {
       return true;
     }
     return getStore(extensionContext).map(getFixtureFromStore).isPresent();
@@ -187,9 +190,9 @@ public class Fixtures
       throws ParameterResolutionException {
 
     Class<?> paramType = parameterContext.getParameter().getType();
-    if (paramType.isAssignableFrom(RepetitionInfo.class)) {
+    if (paramType.isAssignableFrom(RepeatInfo.class)) {
       return getStore(extensionContext)
-          .map(store -> store.get(REPETITION_INFO, RepetitionInfo.class))
+          .map(store -> store.get(REPETITION_INFO, RepeatInfo.class))
           .orElse(null);
     }
     Optional<? extends Fixture> fixture = getStore(extensionContext).map(getFixtureFromStore);

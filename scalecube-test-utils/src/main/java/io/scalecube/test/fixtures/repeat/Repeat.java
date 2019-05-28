@@ -1,16 +1,9 @@
 package io.scalecube.test.fixtures.repeat;
-/*
- * Copyright 2015-2019 the original author or authors.
- *
- * All rights reserved. This program and the accompanying materials are
- * made available under the terms of the Eclipse Public License v2.0 which
- * accompanies this distribution and is available at
- *
- * http://www.eclipse.org/legal/epl-v20.html
- */
 
 import static org.apiguardian.api.API.Status.STABLE;
 
+import io.scalecube.test.fixtures.Fixture;
+import io.scalecube.test.fixtures.WithFixture;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,34 +12,35 @@ import java.lang.annotation.Target;
 
 import org.apiguardian.api.API;
 import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
- * {@code @Repeat} is used to signal that the annotated method is a <em>test template</em>
- * method that should be repeated a {@linkplain #value specified number of times} with a
- * configurable {@linkplain #name display name}.
+ * {@code @Repeat} is used to signal that the annotated method is a <em>test template</em> method
+ * that should be repeated a {@linkplain #value specified number of times} with a configurable
+ * {@linkplain #name display name}.
  *
  * <p>Each invocation of the repeated test behaves like the execution of a regular {@link
- * Test @Test} method with full support for the same lifecycle callbacks and extensions. In
+ * Test @Test} {@link WithFixture} method with full support for the same lifecycle callbacks. In
  * addition, the current repetition and total number of repetitions can be accessed by having the
- * {@link RepetitionInfo} injected.
+ * {@link RepeatInfo} injected.
  *
- * <p>{@code @Repeat} methods must not be {@code private} or {@code static} and must return
- * {@code void}.
+ * <p>Each invocation will run on the same environment.
  *
- * <p>{@code @Repeat} methods may optionally declare parameters to be resolved by {@link
- * org.junit.jupiter.api.extension.ParameterResolver ParameterResolvers}.
+ * <p>{@code @Repeat} methods must not be {@code private} or {@code static} and must return {@code
+ * void}.
  *
- * <p>{@code @Repeat} may also be used as a meta-annotation in order to create a custom
- * <em>composed annotation</em> that inherits the semantics of {@code @Repeat}.
+ * <p>{@code @Repeat} methods may optionally declare parameters to be resolved by {@link Fixtures}
+ * and therefore the test class must have {@link ExtendWith @ExtendWith(Fixtures.class)} .
+ *
+ * <p>{@code @Repeat} may also be used as a meta-annotation in order to create a custom <em>composed
+ * annotation</em> that inherits the semantics of {@code @Repeat}.
  *
  * <h3>Test Execution Order</h3>
  *
  * <p>By default, test methods will be ordered using an algorithm that is deterministic but
  * intentionally nonobvious. This ensures that subsequent runs of a test suite execute test methods
  * in the same order, thereby allowing for repeatable builds. In this context, a <em>test
- * method</em> is any instance method that is directly annotated or meta-annotated with
- * {@code @Test}, {@code @Repeat}, {@code @ParameterizedTest}, {@code @TestFactory}, or
- * {@code @TestTemplate}.
+ * method</em> is any instance method that is directly annotated with {@code @TestTemplate}.
  *
  * <p>Although true <em>unit tests</em> typically should not rely on the order in which they are
  * executed, there are times when it is necessary to enforce a specific test method execution
@@ -60,7 +54,7 @@ import org.junit.jupiter.api.TestTemplate;
  *
  * @since 5.0
  * @see DisplayName
- * @see RepetitionInfo
+ * @see RepeatInfo
  * @see TestTemplate
  * @see TestInfo
  * @see Test
@@ -72,42 +66,48 @@ import org.junit.jupiter.api.TestTemplate;
 @TestTemplate
 public @interface Repeat {
 
-/**
- *   
- */
+  /**
+   * Placeholder for the {@linkplain Fixture#name() fixture name} of a {@code @Repeat} method:
+   * <code>{fixture}</code>.
+   */
   String FIXTURE_NAME_PLACEHOLDER = "{fixture}";
 
   /**
-   * Placeholder for the {@linkplain TestInfo#getDisplayName display name} of a
-   * {@code @Repeat} method: <code>{displayName}</code>
+   * Placeholder for the {@linkplain TestInfo#getDisplayName display name} of a {@code @Repeat}
+   * method: <code>{displayName}</code>.
    */
   String DISPLAY_NAME_PLACEHOLDER = "{displayName}";
 
   /**
    * Placeholder for the current repetition count of a {@code @Repeat} method: <code>
-   * {currentRepetition}</code>
+   * {currentRepetition}</code>.
    */
   String CURRENT_REPETITION_PLACEHOLDER = "{currentRepetition}";
 
   /**
    * Placeholder for the total number of repetitions of a {@code @Repeat} method: <code>
-   * {totalRepetitions}</code>
+   * {totalRepetitions}</code>.
    */
   String TOTAL_REPETITIONS_PLACEHOLDER = "{totalRepetitions}";
 
   /**
-   * <em>Short</em> display name pattern for a repeated test: {@value}
+   * <em>Short</em> display name pattern for a repeated test: {@value}.
    *
    * @see #CURRENT_REPETITION_PLACEHOLDER
    * @see #TOTAL_REPETITIONS_PLACEHOLDER
    * @see #LONG_DISPLAY_NAME
    */
   String SHORT_DISPLAY_NAME =
-      "on " + FIXTURE_NAME_PLACEHOLDER
-      + " [ repetition " + CURRENT_REPETITION_PLACEHOLDER + " of " + TOTAL_REPETITIONS_PLACEHOLDER + " ]";
+      "on "
+          + FIXTURE_NAME_PLACEHOLDER
+          + " [ repetition "
+          + CURRENT_REPETITION_PLACEHOLDER
+          + " of "
+          + TOTAL_REPETITIONS_PLACEHOLDER
+          + " ]";
 
   /**
-   * <em>Long</em> display name pattern for a repeated test: {@value}
+   * <em>Long</em> display name pattern for a repeated test: {@value}.
    *
    * @see #DISPLAY_NAME_PLACEHOLDER
    * @see #SHORT_DISPLAY_NAME

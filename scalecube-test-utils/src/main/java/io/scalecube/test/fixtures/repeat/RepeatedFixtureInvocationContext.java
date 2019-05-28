@@ -3,20 +3,28 @@ package io.scalecube.test.fixtures.repeat;
 import io.scalecube.test.fixtures.Fixture;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 
-public class RepeatedFixtureInvocationContext
-    implements TestTemplateInvocationContext, RepetitionInfo {
+public class RepeatedFixtureInvocationContext implements TestTemplateInvocationContext, RepeatInfo {
 
   private final Fixture fixture;
   private final int currentRepetition;
   private final int totalRepetitions;
-  private final RepeatedTestDisplayNameFormatter formatter;
+  private final RepeatedFixtureTestDisplayNameFormatter formatter;
 
+  /**
+   * Create a new RepeatedFixtureInvocationContext.
+   *
+   * @param repeat the {@link Repeat} annotation of the test
+   * @param fixture the current fixture to run on
+   * @param currentRepetition the current index of the repetition
+   * @param totalRepetitions the total repetitions to do.
+   * @param formatter display name formatter for a {@link Repeat @Repeat}.
+   */
   public RepeatedFixtureInvocationContext(
       Repeat repeat,
       Fixture fixture,
       int currentRepetition,
       int totalRepetitions,
-      RepeatedTestDisplayNameFormatter formatter) {
+      RepeatedFixtureTestDisplayNameFormatter formatter) {
     this.fixture = fixture;
     this.currentRepetition = currentRepetition;
     this.totalRepetitions = totalRepetitions;
