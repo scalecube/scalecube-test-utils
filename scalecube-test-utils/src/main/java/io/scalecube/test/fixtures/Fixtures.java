@@ -126,7 +126,7 @@ public class Fixtures
     return fixture.map(f -> f.proxyFor(paramType)).orElse(null);
   }
 
-  private Function<? super Class<? extends Fixture>, ? extends Fixture> setUp(
+  private static Function<? super Class<? extends Fixture>, ? extends Fixture> setUp(
       Class<? extends Fixture> fixtureClass) {
     return clz -> {
       Fixture f;
