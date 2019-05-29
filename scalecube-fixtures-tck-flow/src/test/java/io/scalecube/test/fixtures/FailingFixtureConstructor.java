@@ -1,13 +1,12 @@
 package io.scalecube.test.fixtures;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.opentest4j.TestAbortedException;
 
 public class FailingFixtureConstructor implements Fixture {
 
-  boolean setupStarted = false;
+  private boolean setupStarted = false;
 
   public FailingFixtureConstructor() {
     throw new IllegalArgumentException();

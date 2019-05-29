@@ -6,7 +6,7 @@ import org.opentest4j.TestAbortedException;
 
 public class FailingFixtureInSetup implements Fixture {
 
-  boolean setupStarted = false;
+  private boolean setupStarted = false;
 
   @Override
   public void setUp() throws TestAbortedException {
