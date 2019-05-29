@@ -1,12 +1,11 @@
 package io.scalecube.test.fixtures;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-/**
- * An abstract provider for {@link Fixture}. This utility class does not implement {@link Supplier}
- * or {@link Function}.
+/** 
+ * An abstract provider for {@link Fixture}.
+ * This utility class does not implement {@link Supplier} or {@link Function}.
  */
 public class FixtureFactory {
 
@@ -20,11 +19,8 @@ public class FixtureFactory {
   public static Fixture getFixture(Class<? extends Fixture> fixtureClass)
       throws FixtureCreationException {
     try {
-      return fixtureClass.getConstructor(new Class[] {}).newInstance();
-    } catch (InvocationTargetException
-        | NoSuchMethodException
-        | InstantiationException
-        | IllegalAccessException cause) {
+      return fixtureClass.newInstance();
+    } catch (InstantiationException | IllegalAccessException cause) {
       throw new FixtureCreationException(cause);
     }
   }
