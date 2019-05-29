@@ -4,10 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestTemplate;
 
 /** Extend this test with your annotations. you may add some more tests. */
 public class BaseTest {
+
+  @BeforeEach
+  public void setUp(TestInfo testInfo) {
+    System.out.println("︵‿︵‿︵‿︵‿︵ " + testInfo.getDisplayName() + " started ‿︵‿︵‿︵‿︵‿︵‿︵");
+  }
 
   /**
    * basic test.
