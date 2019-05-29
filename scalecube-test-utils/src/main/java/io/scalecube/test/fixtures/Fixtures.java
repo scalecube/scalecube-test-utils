@@ -170,9 +170,6 @@ public class Fixtures
       ParameterContext parameterContext, ExtensionContext extensionContext)
       throws ParameterResolutionException {
     Class<?> type = parameterContext.getParameter().getType();
-    if (type.isAssignableFrom(TestInfo.class)) {
-      return false;
-    }
     if (type.isAssignableFrom(RepeatInfo.class)) {
       return true;
     }
