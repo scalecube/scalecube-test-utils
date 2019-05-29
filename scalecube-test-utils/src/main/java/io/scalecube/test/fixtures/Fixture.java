@@ -1,6 +1,8 @@
 package io.scalecube.test.fixtures;
 
 import java.lang.reflect.Proxy;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.opentest4j.TestAbortedException;
@@ -57,8 +59,12 @@ import org.opentest4j.TestAbortedException;
 public interface Fixture {
 
   /**
-   * Set up the environment access. May throw a {@link TestAbortedException} if something went
-   * wrong.
+   * Set up the environment access. Implementors of this class should throw {@link
+   * TestAbortedException} to indicate that the environment is not set and ready, thus skipping the
+   * test. a nice way to do that is using {@link Assumptions}. If there is a need to fail the entire
+   * test-case - an implementor can do {@link Assertions}. If the setup of the fixture is very
+   * important and must fail the build - an implementor should throw whatever type of unchecked
+   * {@link Exception} thus failing the tests with Error.
    */
   void setUp() throws TestAbortedException;
 
@@ -70,7 +76,7 @@ public interface Fixture {
    * mock, local or remote (using or not using {@link Proxy}).
    *
    * @param clasz the type of the object in the environment. mostly an interface.
-   * @return an access object, nu
+   * @return an access object, can be null.
    */
   <T> T proxyFor(Class<? extends T> clasz);
 

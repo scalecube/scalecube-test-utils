@@ -4,6 +4,7 @@ import io.scalecube.test.fixtures.EchoService;
 import io.scalecube.test.fixtures.Fixture;
 import io.scalecube.test.fixtures.PalindromeService;
 import java.io.IOException;
+import org.opentest4j.TestAbortedException;
 import org.testcontainers.containers.Container.ExecResult;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
@@ -17,12 +18,17 @@ public class DockerfileFixture implements Fixture {
   @Override
   public void setUp() {
 
-    ImageFromDockerfile imageFromDockerfile =
-        new ImageFromDockerfile()
-            .withDockerfileFromBuilder(
-                builder -> builder.from("ubuntu").entryPoint("sleep infinity").build());
-    genericContainer = new GenericContainer<>(imageFromDockerfile);
-    genericContainer.start();
+    try {
+      ImageFromDockerfile imageFromDockerfile =
+          new ImageFromDockerfile()
+              .withDockerfileFromBuilder(
+                  builder -> builder.from("ubuntu").entryPoint("sleep infinity").build());
+      genericContainer = new GenericContainer<>(imageFromDockerfile);
+      genericContainer.start();
+    } catch (Exception cause) { 
+      throw new TestAbortedException("unable to start docker", cause);
+    }
+
     echoService =
         s -> {
           try {

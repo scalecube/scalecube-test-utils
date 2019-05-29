@@ -197,17 +197,30 @@ public class Fixtures
   private static Function<? super Class<? extends Fixture>, ? extends Fixture> setUp(
       Class<? extends Fixture> fixtureClass) {
     return clz -> {
+      Fixture f;
       try {
-        Fixture f = FixtureFactory.getFixture(fixtureClass);
-        f.setUp();
-        return f;
+        f = FixtureFactory.getFixture(fixtureClass);
       } catch (FixtureCreationException fixtureCreationException) {
         throw new TestAbortedException(
-            "unable to setup fixture",
+            "Unable to create fixture",
             new ExtensionConfigurationException(
-                "unable to setup fixture", fixtureCreationException));
+                "Unable to create fixture", fixtureCreationException));
       } catch (TestAbortedException abortedException) {
         throw abortedException;
+      }
+
+      try {
+        f.setUp();
+        return f;
+      } catch (TestAbortedException abortedException) {
+        try {
+          f.tearDown();
+        } catch (Exception supressed) {
+          abortedException.addSuppressed(supressed);
+        }
+        throw new TestAbortedException(
+            "Unable to setup fixture",
+            new ExtensionConfigurationException("Unable to setup fixture", abortedException));
       }
     };
   }
