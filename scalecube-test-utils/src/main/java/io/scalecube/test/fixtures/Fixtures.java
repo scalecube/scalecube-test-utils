@@ -4,6 +4,7 @@ import io.scalecube.test.fixtures.repeat.Repeat;
 import io.scalecube.test.fixtures.repeat.RepeatInfo;
 import io.scalecube.test.fixtures.repeat.RepeatedFixtureInvocationContext;
 import io.scalecube.test.fixtures.repeat.RepeatedFixtureTestDisplayNameFormatter;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -210,11 +211,13 @@ public class Fixtures
       }
 
       try {
+        deepSetUp(f);
         f.setUp();
         return f;
       } catch (TestAbortedException abortedException) {
         try {
           f.tearDown();
+          deepTearDown(f);
         } catch (Exception supressed) {
           abortedException.addSuppressed(supressed);
         }
@@ -225,6 +228,38 @@ public class Fixtures
     };
   }
 
+  private static void deepSetUp(Fixture f) throws TestAbortedException {
+    for (Field field : f.getClass().getFields()) {
+      if (field.getType().isAssignableFrom(Fixture.class)) {
+        Fixture petentialInnerFixture;
+        try {
+          if ((petentialInnerFixture = (Fixture) field.get(f)) != null) {
+            petentialInnerFixture.setUp();
+          }
+        } catch (IllegalArgumentException | IllegalAccessException cause) {
+          throw new TestAbortedException(
+              "unable to build inner fixture: "
+                  + f.getClass().getSimpleName()
+                  + "::"
+                  + field.getType(),
+              cause);
+        }
+      }
+    }
+  }
+
+  private static void deepTearDown(Fixture f)
+      throws IllegalArgumentException, IllegalAccessException {
+    for (Field field : f.getClass().getFields()) {
+      if (field.getType().isAssignableFrom(Fixture.class)) {
+        Fixture petentialInnerFixture;
+        if ((petentialInnerFixture = (Fixture) field.get(f)) != null) {
+          petentialInnerFixture.tearDown();
+        }
+      }
+    }
+  }
+
   private void tearDown(ExtensionContext extensionContext) {
     getStore(extensionContext)
         .ifPresent(
@@ -232,7 +267,14 @@ public class Fixtures
               Optional<Fixture> fixture = Optional.ofNullable(store.get(FIXTURE, Fixture.class));
               store.remove(FIXTURE);
               store.remove(FIXTURE_LIFECYCLE);
-
+              fixture.ifPresent(
+                  t -> {
+                    try {
+                      deepTearDown(t);
+                    } catch (IllegalArgumentException | IllegalAccessException ignoredException) {
+                      ignoredException.printStackTrace();
+                    }
+                  });
               fixture.ifPresent(Fixture::tearDown);
               fixture.map(Object::getClass).ifPresent(initializedFixtures::remove);
               fixture.map(Object::getClass).ifPresent(store::remove);
