@@ -4,7 +4,6 @@ import io.scalecube.test.fixtures.repeat.Repeat;
 import io.scalecube.test.fixtures.repeat.RepeatInfo;
 import io.scalecube.test.fixtures.repeat.RepeatedFixtureInvocationContext;
 import io.scalecube.test.fixtures.repeat.RepeatedFixtureTestDisplayNameFormatter;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +50,7 @@ public class Fixtures
   private static Namespace namespace = Namespace.create(Fixtures.class);
 
   private final Map<Class<? extends Fixture>, Fixture> initializedFixtures = new HashMap<>();
-
+  
   private static final Function<? super Store, ? extends Fixture> getFixtureFromStore =
       store -> store.get(FIXTURE, Fixture.class);
 
@@ -96,7 +95,7 @@ public class Fixtures
             withFixture -> {
               Fixture fixture =
                   initializedFixtures.computeIfAbsent(
-                      withFixture.value(), setUp(withFixture.value()));
+                      withFixture.value(), setUp(withFixture, context));
               Optional<ExtensionContext> storeInContext = Optional.of(context);
               Lifecycle lifecycle = withFixture.lifecycle();
               if (Lifecycle.PER_CLASS.equals(lifecycle)) {
@@ -195,12 +194,12 @@ public class Fixtures
     return fixture.map(f -> f.proxyFor(paramType)).orElse(null);
   }
 
-  private static Function<? super Class<? extends Fixture>, ? extends Fixture> setUp(
-      Class<? extends Fixture> fixtureClass) {
+  Function<? super Class<? extends Fixture>, ? extends Fixture> setUp(
+      WithFixture withFixture, ExtensionContext context) {
     return clz -> {
       Fixture f;
       try {
-        f = FixtureFactory.getFixture(fixtureClass);
+        f = FixtureFactory.getFixture(this, context, withFixture);
       } catch (FixtureCreationException fixtureCreationException) {
         throw new TestAbortedException(
             "Unable to create fixture",
@@ -211,13 +210,11 @@ public class Fixtures
       }
 
       try {
-        deepSetUp(f);
         f.setUp();
         return f;
       } catch (TestAbortedException abortedException) {
         try {
           f.tearDown();
-          deepTearDown(f);
         } catch (Exception supressed) {
           abortedException.addSuppressed(supressed);
         }
@@ -228,38 +225,6 @@ public class Fixtures
     };
   }
 
-  private static void deepSetUp(Fixture f) throws TestAbortedException {
-    for (Field field : f.getClass().getFields()) {
-      if (field.getType().isAssignableFrom(Fixture.class)) {
-        Fixture petentialInnerFixture;
-        try {
-          if ((petentialInnerFixture = (Fixture) field.get(f)) != null) {
-            petentialInnerFixture.setUp();
-          }
-        } catch (IllegalArgumentException | IllegalAccessException cause) {
-          throw new TestAbortedException(
-              "unable to build inner fixture: "
-                  + f.getClass().getSimpleName()
-                  + "::"
-                  + field.getType(),
-              cause);
-        }
-      }
-    }
-  }
-
-  private static void deepTearDown(Fixture f)
-      throws IllegalArgumentException, IllegalAccessException {
-    for (Field field : f.getClass().getFields()) {
-      if (field.getType().isAssignableFrom(Fixture.class)) {
-        Fixture petentialInnerFixture;
-        if ((petentialInnerFixture = (Fixture) field.get(f)) != null) {
-          petentialInnerFixture.tearDown();
-        }
-      }
-    }
-  }
-
   private void tearDown(ExtensionContext extensionContext) {
     getStore(extensionContext)
         .ifPresent(
@@ -267,14 +232,7 @@ public class Fixtures
               Optional<Fixture> fixture = Optional.ofNullable(store.get(FIXTURE, Fixture.class));
               store.remove(FIXTURE);
               store.remove(FIXTURE_LIFECYCLE);
-              fixture.ifPresent(
-                  t -> {
-                    try {
-                      deepTearDown(t);
-                    } catch (IllegalArgumentException | IllegalAccessException ignoredException) {
-                      ignoredException.printStackTrace();
-                    }
-                  });
+
               fixture.ifPresent(Fixture::tearDown);
               fixture.map(Object::getClass).ifPresent(initializedFixtures::remove);
               fixture.map(Object::getClass).ifPresent(store::remove);
