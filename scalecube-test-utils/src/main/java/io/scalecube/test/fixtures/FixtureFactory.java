@@ -26,7 +26,7 @@ public class FixtureFactory {
    * @throws FixtureCreationException whenever creation is not possible.
    */
   public static Fixture getFixture(
-      FixturesExtention fixtures, ExtensionContext context, WithFixture withFixture)
+      FixturesExtension fixtures, ExtensionContext context, WithFixture withFixture)
       throws FixtureCreationException {
     Class<? extends Fixture> baseFixtureClass = withFixture.value();
     try {

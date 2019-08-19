@@ -7,16 +7,16 @@ import org.opentest4j.TestAbortedException;
 
 final class CompositeFixture implements Fixture {
   private final Fixture base;
-  private final List<Fixture> paramters;
+  private final List<Fixture> parameters;
 
-  public CompositeFixture(Fixture base, List<Fixture> paramters) {
-    this.paramters = paramters;
+  public CompositeFixture(Fixture base, List<Fixture> parameters) {
+    this.parameters = parameters;
     this.base = base;
   }
 
   @Override
   public void setUp() throws TestAbortedException {
-    for (Fixture inParameters : paramters) {
+    for (Fixture inParameters : parameters) {
       inParameters.setUp();
     }
     base.setUp();
@@ -28,7 +28,7 @@ final class CompositeFixture implements Fixture {
     if (t != null) {
       return t;
     }
-    for (Fixture fixture : paramters) {
+    for (Fixture fixture : parameters) {
       t = fixture.proxyFor(clasz);
       if (t != null) {
         return t;
@@ -40,7 +40,7 @@ final class CompositeFixture implements Fixture {
   @Override
   public void tearDown() {
     Exception exception = new Exception();
-    for (Fixture fixture : paramters) {
+    for (Fixture fixture : parameters) {
       try {
         fixture.tearDown();
       } catch (Exception suppressException) {

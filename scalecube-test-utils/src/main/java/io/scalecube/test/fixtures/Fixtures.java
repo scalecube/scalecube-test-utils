@@ -41,7 +41,7 @@ public class Fixtures
         AfterEachCallback,
         TestTemplateInvocationContextProvider,
         ParameterResolver,
-        FixturesExtention {
+        FixturesExtension {
 
   private static final String FIXTURE = "Fixture";
   private static final String FIXTURE_LIFECYCLE = "FixtureLifecycle";
