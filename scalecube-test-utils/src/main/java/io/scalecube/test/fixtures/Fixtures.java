@@ -40,7 +40,8 @@ public class Fixtures
     implements AfterAllCallback,
         AfterEachCallback,
         TestTemplateInvocationContextProvider,
-        ParameterResolver {
+        ParameterResolver,
+        FixturesExtention {
 
   private static final String FIXTURE = "Fixture";
   private static final String FIXTURE_LIFECYCLE = "FixtureLifecycle";
@@ -50,7 +51,7 @@ public class Fixtures
   private static Namespace namespace = Namespace.create(Fixtures.class);
 
   private final Map<Class<? extends Fixture>, Fixture> initializedFixtures = new HashMap<>();
-  
+
   private static final Function<? super Store, ? extends Fixture> getFixtureFromStore =
       store -> store.get(FIXTURE, Fixture.class);
 
@@ -194,7 +195,8 @@ public class Fixtures
     return fixture.map(f -> f.proxyFor(paramType)).orElse(null);
   }
 
-  Function<? super Class<? extends Fixture>, ? extends Fixture> setUp(
+  @Override
+  public Function<? super Class<? extends Fixture>, ? extends Fixture> setUp(
       WithFixture withFixture, ExtensionContext context) {
     return clz -> {
       Fixture f;

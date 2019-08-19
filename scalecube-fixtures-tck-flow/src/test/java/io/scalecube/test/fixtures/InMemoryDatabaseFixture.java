@@ -4,7 +4,7 @@ import org.opentest4j.TestAbortedException;
 
 public class InMemoryDatabaseFixture implements Fixture {
 
-  DatasourceService data;
+  private DatasourceService data;
 
   @Override
   public void setUp() throws TestAbortedException {
@@ -20,5 +20,7 @@ public class InMemoryDatabaseFixture implements Fixture {
   }
 
   @Override
-  public void tearDown() {}
+  public void tearDown() {
+    data.keys().forEach(data::delete);
+  }
 }

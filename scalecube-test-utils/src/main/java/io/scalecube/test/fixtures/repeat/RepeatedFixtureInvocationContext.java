@@ -12,6 +12,7 @@ public class RepeatedFixtureInvocationContext implements TestTemplateInvocationC
 
   /**
    * Create a new RepeatedFixtureInvocationContext.
+   *
    * @param fixture the current fixture to run on
    * @param currentRepetition the current index of the repetition
    * @param totalRepetitions the total repetitions to do.

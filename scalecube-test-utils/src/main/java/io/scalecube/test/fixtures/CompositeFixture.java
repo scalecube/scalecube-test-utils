@@ -2,6 +2,7 @@ package io.scalecube.test.fixtures;
 
 import java.util.List;
 import java.util.stream.Stream;
+import org.opentest4j.AssertionFailedError;
 import org.opentest4j.TestAbortedException;
 
 final class CompositeFixture implements Fixture {
@@ -55,7 +56,7 @@ final class CompositeFixture implements Fixture {
       throw mainException;
     }
     if (exception.getSuppressed().length != 0) {
-      throw new RuntimeException(exception);
+      throw new AssertionFailedError("tear down failed", exception);
     }
   }
 

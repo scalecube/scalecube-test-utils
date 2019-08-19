@@ -8,20 +8,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(Fixtures.class)
 @WithFixture(value = FastFixture.class, lifecycle = Lifecycle.PER_CLASS)
 class CompositeFixtureTest extends BaseTest {
+
   @Test
-  void verifyDataIntegrity(DatasourceService service) {
+  public void verifyDataIntegrity(DatasourceService service) {
     service.put("A", "B");
     Assertions.assertEquals("B", service.get("A"));
   }
 
   @Test
-  void verifyDataIntegrity2(DatasourceService data, EchoService echo) {
+  public void verifyDataIntegrity2(DatasourceService data, EchoService echo) {
     data.put("A", "B");
     Assertions.assertEquals("B", echo.echo(data.get("A")));
   }
 
   @Test
-  void verifyDataIntegrity3(DatasourceService data, PalindromeService palindromeService) {
+  public void verifyDataIntegrity3(DatasourceService data, PalindromeService palindromeService) {
     data.put("A", "CAFEEFAC");
     Assertions.assertTrue(palindromeService.palindrome(data.get("A")));
   }
