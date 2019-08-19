@@ -6,7 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 
 public class InMemoryDatabaseService implements DatasourceService {
-  Map<String, String> data = new HashMap<>();
+
+  private Map<String, String> data = new HashMap<>();
 
   @Override
   public String get(String key) {
