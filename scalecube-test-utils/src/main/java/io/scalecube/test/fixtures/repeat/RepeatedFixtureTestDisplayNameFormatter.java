@@ -32,7 +32,7 @@ public class RepeatedFixtureTestDisplayNameFormatter {
     this.displayName = displayName;
     this.fixtureName = fixtureName;
   }
-  
+
   /**
    * Format the {@link DisplayName} with the {@link RepeatInfo}.
    *

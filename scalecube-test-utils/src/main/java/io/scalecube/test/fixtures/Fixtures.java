@@ -40,7 +40,8 @@ public class Fixtures
     implements AfterAllCallback,
         AfterEachCallback,
         TestTemplateInvocationContextProvider,
-        ParameterResolver {
+        ParameterResolver,
+        FixturesExtension {
 
   private static final String FIXTURE = "Fixture";
   private static final String FIXTURE_LIFECYCLE = "FixtureLifecycle";
@@ -95,7 +96,7 @@ public class Fixtures
             withFixture -> {
               Fixture fixture =
                   initializedFixtures.computeIfAbsent(
-                      withFixture.value(), setUp(withFixture.value()));
+                      withFixture.value(), setUp(withFixture, context));
               Optional<ExtensionContext> storeInContext = Optional.of(context);
               Lifecycle lifecycle = withFixture.lifecycle();
               if (Lifecycle.PER_CLASS.equals(lifecycle)) {
@@ -194,12 +195,13 @@ public class Fixtures
     return fixture.map(f -> f.proxyFor(paramType)).orElse(null);
   }
 
-  private static Function<? super Class<? extends Fixture>, ? extends Fixture> setUp(
-      Class<? extends Fixture> fixtureClass) {
+  @Override
+  public Function<? super Class<? extends Fixture>, ? extends Fixture> setUp(
+      WithFixture withFixture, ExtensionContext context) {
     return clz -> {
       Fixture f;
       try {
-        f = FixtureFactory.getFixture(fixtureClass);
+        f = FixtureFactory.getFixture(this, context, withFixture);
       } catch (FixtureCreationException fixtureCreationException) {
         throw new TestAbortedException(
             "Unable to create fixture",

@@ -13,7 +13,7 @@ public class DockerfileFixture implements Fixture {
 
   private EchoService echoService;
   private PalindromeService palindromeService;
-  private GenericContainer genericContainer;
+  private GenericContainer<?> genericContainer;
 
   @Override
   public void setUp() {
@@ -25,7 +25,7 @@ public class DockerfileFixture implements Fixture {
                   builder -> builder.from("ubuntu").entryPoint("sleep infinity").build());
       genericContainer = new GenericContainer<>(imageFromDockerfile);
       genericContainer.start();
-    } catch (Exception cause) { 
+    } catch (Exception cause) {
       throw new TestAbortedException("unable to start docker", cause);
     }
 
