@@ -32,4 +32,11 @@ public @interface WithFixture {
    *     a fixture that setup {@link BeforeEach} test execution and tears down {@link AfterEach}
    */
   TestInstance.Lifecycle lifecycle() default Lifecycle.PER_CLASS;
+
+  /**
+   * Properties for this fixture.
+   * use the format "k=v"
+   * @return
+   */
+  String[] properties() default {};
 }
