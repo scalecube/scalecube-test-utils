@@ -39,12 +39,12 @@ public class BaseFixture implements Fixture {
     constructorWithPropertiesWasCalled = true;
   }
 
-  protected BaseFixture(SomeInterface1 withSomeInterface) {
+  protected BaseFixture(InterfaceToSomeService withSomeInterface) {
     constructorWithInterfaceWasCalled = true;
     this.properties = System.getProperties();
   }
 
-  protected BaseFixture(Properties p, SomeInterface1 withSomeInterface) {
+  protected BaseFixture(Properties p, InterfaceToSomeService withSomeInterface) {
     constructorWithInterfaceWasCalled = true;
     constructorWithPropertiesWasCalled = true;
     this.properties = p;

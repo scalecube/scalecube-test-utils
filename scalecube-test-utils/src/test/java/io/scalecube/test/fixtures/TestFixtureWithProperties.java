@@ -13,7 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @WithFixture(CallingDefaultConstructor.class)
 @WithFixture(CallingPropertiesConstructor.class)
 @WithFixture(value = WithSomeProperties.class, properties = "property=value")
-@WithFixture(value = WithSomeProperties.class, properties = "property=valu11e")
+// Produces error: @WithFixture(value = WithSomeProperties.class, properties = "property=valu11e")
+@WithFixture(CallingInterfaceConstructor.class)
+@WithFixture(CallingPropertiesAndInterfaceConstructor.class)
 public class TestFixtureWithProperties {
 
   @TestTemplate
@@ -31,6 +33,14 @@ public class TestFixtureWithProperties {
       assertFalse(spy.constructorWithInterfaceWasCalled());
       assertTrue(spy.constructorWithPropertiesWasCalled());
       assertEquals("value", p.getProperty("property"));
+    } else if (testType.isAssignableFrom(CallingInterfaceConstructor.class)) {
+      assertFalse(spy.constructorWasCalled());
+      assertTrue(spy.constructorWithInterfaceWasCalled());
+      assertFalse(spy.constructorWithPropertiesWasCalled());
+    } else if (testType.isAssignableFrom(CallingPropertiesAndInterfaceConstructor.class)) {
+      assertFalse(spy.constructorWasCalled());
+      assertTrue(spy.constructorWithInterfaceWasCalled());
+      assertTrue(spy.constructorWithPropertiesWasCalled());
     } else {
       fail();
     }
