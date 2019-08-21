@@ -5,7 +5,7 @@ import org.opentest4j.TestAbortedException;
 
 public class BaseFixture implements Fixture {
 
-  InvocationSpyFixture spy =
+  private final InvocationSpyFixture spy =
       new InvocationSpyFixture() {
 
         @Override
