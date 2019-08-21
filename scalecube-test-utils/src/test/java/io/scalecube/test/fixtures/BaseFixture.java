@@ -50,7 +50,7 @@ public class BaseFixture implements Fixture {
     this.properties = p;
   }
 
-  protected BaseFixture(SomeInterface1 withSomeInterface, Properties p) {
+  protected BaseFixture(InterfaceToSomeService withSomeInterface, Properties p) {
     constructorWithInterfaceWasCalled = true;
     constructorWithPropertiesWasCalled = true;
     this.properties = p;
