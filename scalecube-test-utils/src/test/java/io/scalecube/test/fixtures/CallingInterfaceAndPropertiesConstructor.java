@@ -34,7 +34,9 @@ public class CallingInterfaceAndPropertiesConstructor implements Fixture {
   }
 
   @Override
-  public void setUp() throws TestAbortedException {}
+  public void setUp() throws TestAbortedException {
+    // do nothing
+  }
 
   @Override
   public <T> T proxyFor(Class<? extends T> clasz) {
@@ -48,5 +50,7 @@ public class CallingInterfaceAndPropertiesConstructor implements Fixture {
   }
 
   @Override
-  public void tearDown() {}
+  public void tearDown() {
+    // do nothing
+  }
 }

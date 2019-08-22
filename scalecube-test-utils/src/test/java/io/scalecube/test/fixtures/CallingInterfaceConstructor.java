@@ -52,8 +52,12 @@ public class CallingInterfaceConstructor implements Fixture {
   }
 
   @Override
-  public void setUp() throws TestAbortedException {}
+  public void setUp() throws TestAbortedException {
+    // do nothing
+  }
 
   @Override
-  public void tearDown() {}
+  public void tearDown() {
+    // do nothing
+  }
 }
