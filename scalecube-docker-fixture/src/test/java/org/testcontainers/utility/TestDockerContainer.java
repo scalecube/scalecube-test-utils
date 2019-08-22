@@ -7,6 +7,4 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(Fixtures.class)
 @WithFixture(DockerfileFixture.class)
-public class TestDockerContainer extends BaseTest {
-  
-}
+public class TestDockerContainer extends BaseTest {}
