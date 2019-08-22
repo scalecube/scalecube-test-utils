@@ -29,8 +29,8 @@ public class CallingInterfaceAndPropertiesConstructor implements Fixture {
   private boolean constructorWithInterfaceWasCalled = false;
 
   public CallingInterfaceAndPropertiesConstructor(InterfaceToSomeService service, Properties p) {
-    constructorWithInterfaceWasCalled = true;
-    constructorWithPropertiesWasCalled = true;
+    constructorWithInterfaceWasCalled = service != null;
+    constructorWithPropertiesWasCalled = p != null;
   }
 
   @Override

@@ -31,8 +31,8 @@ public class CallingPropertiesAndInterfaceConstructor implements Fixture {
 
   public CallingPropertiesAndInterfaceConstructor(
       Properties properties, InterfaceToSomeService service) {
-    constructorWithInterfaceWasCalled = true;
-    constructorWithPropertiesWasCalled = true;
+    constructorWithInterfaceWasCalled = service != null;
+    constructorWithPropertiesWasCalled = properties != null;
     this.properties = properties;
   }
 
