@@ -52,14 +52,8 @@ public class CallingInterfaceConstructor implements Fixture {
   }
 
   @Override
-  public void setUp() throws TestAbortedException {
-    // TODO Auto-generated method stub
-
-  }
+  public void setUp() throws TestAbortedException {}
 
   @Override
-  public void tearDown() {
-    // TODO Auto-generated method stub
-
-  }
+  public void tearDown() {}
 }
