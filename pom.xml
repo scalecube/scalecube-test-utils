@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>scalecube-test-utils-parent</artifactId>
-  <version>0.0.6</version>
+  <version>0.0.7-SNAPSHOT</version>
   <name>Scalecube utilities for unit and integration tesing</name>
 
   <parent>
@@ -14,7 +14,7 @@
     <url>https://github.com/scalecube/scalecube-test-utils</url>
     <connection>scm:git:git@github.com:scalecube/scalecube-test-utils.git</connection>
     <developerConnection>scm:git:git@github.com:scalecube/scalecube-test-utils.git</developerConnection>
-    <tag>v0.0.6</tag>
+    <tag>HEAD</tag>
   </scm>
   <properties>
     <junit-jupiter.version>5.4.2</junit-jupiter.version>
