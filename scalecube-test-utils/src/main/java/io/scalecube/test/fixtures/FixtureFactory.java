@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -32,7 +34,13 @@ public class FixtureFactory {
     try {
       List<WithFixture> fixturesToGet =
           AnnotationUtils.findRepeatableAnnotations(baseFixtureClass, WithFixture.class);
+
       if (fixturesToGet.isEmpty()) {
+        Optional<Constructor<? extends Fixture>> constructorWithProperties =
+            getConstructorWithProperties(baseFixtureClass);
+        if (constructorWithProperties.isPresent()) {
+          return constructorWithProperties.get().newInstance(fromEntries(withFixture.properties()));
+        }
         return baseFixtureClass.newInstance();
       }
 
@@ -55,7 +63,11 @@ public class FixtureFactory {
         for (int i = 0; i < parameters.length; i++) {
           if (arguments[i] == null) {
             Parameter parameter = parameters[i];
-            arguments[i] = f.proxyFor(parameter.getType());
+            if (parameter.getType().isAssignableFrom(Properties.class)) {
+              arguments[i] = fromEntries(fixtureToGet.properties());
+            } else {
+              arguments[i] = f.proxyFor(parameter.getType());
+            }
           }
         }
       }
@@ -64,5 +76,30 @@ public class FixtureFactory {
     } catch (InstantiationException | IllegalAccessException | InvocationTargetException cause) {
       throw new FixtureCreationException(cause);
     }
+  }
+
+  private static Optional<Constructor<? extends Fixture>> getConstructorWithProperties(
+      Class<? extends Fixture> baseFixtureClass) {
+    try {
+      return Optional.ofNullable(baseFixtureClass.getDeclaredConstructor(Properties.class));
+    } catch (NoSuchMethodException | SecurityException ignoredException) {
+      return Optional.empty();
+    }
+  }
+
+  private static Properties fromEntries(String[] entries) {
+    Properties p = new Properties(System.getProperties());
+    for (String entry : entries) {
+      String[] split = entry.split("=");
+      if (split.length == 2) {
+        String key = split[0].trim();
+        String value = split[1].trim();
+        if (key.isEmpty()) {
+          continue;
+        }
+        p.put(key, value);
+      }
+    }
+    return p;
   }
 }
