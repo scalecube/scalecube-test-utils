@@ -16,9 +16,6 @@ final class CompositeFixture implements Fixture {
 
   @Override
   public void setUp() throws TestAbortedException {
-    for (Fixture inParameters : parameters) {
-      inParameters.setUp();
-    }
     base.setUp();
   }
 
