@@ -3,7 +3,7 @@
   <parent>
     <groupId>io.scalecube</groupId>
     <artifactId>scalecube-test-utils-parent</artifactId>
-    <version>0.0.7-SNAPSHOT</version>
+    <version>0.0.7</version>
   </parent>
   <artifactId>scalecube-test-utils</artifactId>
   <properties>
