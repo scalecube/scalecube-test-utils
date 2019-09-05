@@ -236,8 +236,16 @@ public class Fixtures
               store.remove(FIXTURE_LIFECYCLE);
 
               fixture.ifPresent(Fixture::tearDown);
-              fixture.map(Object::getClass).ifPresent(initializedFixtures::remove);
-              fixture.map(Object::getClass).ifPresent(store::remove);
+              fixture
+                  .map(Fixtures::baseFixture)
+                  .map(Object::getClass)
+                  .ifPresent(initializedFixtures::remove);
+
+              fixture.map(Fixtures::baseFixture).map(Object::getClass).ifPresent(store::remove);
             });
+  }
+
+  private static Fixture baseFixture(Fixture f) {
+    return (f instanceof CompositeFixture) ? ((CompositeFixture) f).base() : f;
   }
 }
