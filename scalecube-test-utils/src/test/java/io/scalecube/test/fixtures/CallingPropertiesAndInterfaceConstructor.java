@@ -50,7 +50,6 @@ public class CallingPropertiesAndInterfaceConstructor implements Fixture {
       return clasz.cast(this.getClass());
     }
     if (clasz.isAssignableFrom(Properties.class)) {
-
       return clasz.cast(properties);
     }
     return null;

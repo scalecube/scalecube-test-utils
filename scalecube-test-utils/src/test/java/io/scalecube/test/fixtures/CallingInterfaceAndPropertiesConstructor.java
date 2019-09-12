@@ -27,9 +27,11 @@ public class CallingInterfaceAndPropertiesConstructor implements Fixture {
   private boolean constructorWasCalled = false;
   private boolean constructorWithPropertiesWasCalled = false;
   private boolean constructorWithInterfaceWasCalled = false;
+  private final Properties properties;
 
   public CallingInterfaceAndPropertiesConstructor(InterfaceToSomeService service, Properties p) {
     constructorWithInterfaceWasCalled = service != null;
+    this.properties = p;
     constructorWithPropertiesWasCalled = p != null;
   }
 
@@ -45,6 +47,9 @@ public class CallingInterfaceAndPropertiesConstructor implements Fixture {
     }
     if (clasz.isAssignableFrom(Class.class)) {
       return clasz.cast(this.getClass());
+    }
+    if (clasz.isAssignableFrom(Properties.class)) {
+      return clasz.cast(properties);
     }
     return null;
   }
