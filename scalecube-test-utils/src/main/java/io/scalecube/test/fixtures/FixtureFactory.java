@@ -31,6 +31,7 @@ public class FixtureFactory {
       FixturesExtension fixtures, ExtensionContext context, WithFixture withFixture)
       throws FixtureCreationException {
     Class<? extends Fixture> baseFixtureClass = withFixture.value();
+    Properties baseFixtureProperties = fromEntries(withFixture.properties());
     try {
       List<WithFixture> fixturesToGet =
           AnnotationUtils.findRepeatableAnnotations(baseFixtureClass, WithFixture.class);
@@ -39,7 +40,7 @@ public class FixtureFactory {
         Optional<Constructor<? extends Fixture>> constructorWithProperties =
             getConstructorWithProperties(baseFixtureClass);
         if (constructorWithProperties.isPresent()) {
-          return constructorWithProperties.get().newInstance(fromEntries(withFixture.properties()));
+          return constructorWithProperties.get().newInstance(baseFixtureProperties);
         }
         return baseFixtureClass.newInstance();
       }
@@ -64,7 +65,9 @@ public class FixtureFactory {
           if (arguments[i] == null) {
             Parameter parameter = parameters[i];
             if (parameter.getType().isAssignableFrom(Properties.class)) {
-              arguments[i] = fromEntries(fixtureToGet.properties());
+              Properties properties = new Properties(baseFixtureProperties);
+              properties.putAll(fromEntries(fixtureToGet.properties()));
+              arguments[i] = properties;
             } else {
               arguments[i] = f.proxyFor(parameter.getType());
             }
