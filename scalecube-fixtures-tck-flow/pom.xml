@@ -3,7 +3,7 @@
   <parent>
     <groupId>io.scalecube</groupId>
     <artifactId>scalecube-test-utils-parent</artifactId>
-    <version>0.0.8</version>
+    <version>0.0.9-SNAPSHOT</version>
   </parent>
   <artifactId>scalecube-fixtures-tck-flow</artifactId>
   <dependencies>
