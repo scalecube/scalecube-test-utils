@@ -1,14 +1,19 @@
 package io.scalecube.test.fixtures;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.util.AnnotationUtils;
 
@@ -17,6 +22,9 @@ import org.junit.platform.commons.util.AnnotationUtils;
  * or {@link Function}.
  */
 public class FixtureFactory {
+
+  @SuppressWarnings("unchecked")
+  private static final Class<? extends Fixture>[] EMPTY_FIXTURES = new Class[] {};
 
   /**
    * Create a fixture object.
@@ -34,7 +42,10 @@ public class FixtureFactory {
     Properties baseFixtureProperties = fromEntries(withFixture.properties());
     try {
       List<WithFixture> fixturesToGet =
-          AnnotationUtils.findRepeatableAnnotations(baseFixtureClass, WithFixture.class);
+          new ArrayList<>(
+              AnnotationUtils.findRepeatableAnnotations(baseFixtureClass, WithFixture.class));
+
+      fixturesToGet.addAll(dependencyFixtures(withFixture.dependsOn(), baseFixtureProperties));
 
       if (fixturesToGet.isEmpty()) {
         Optional<Constructor<? extends Fixture>> constructorWithProperties =
@@ -81,6 +92,44 @@ public class FixtureFactory {
     }
   }
 
+  private static Collection<? extends WithFixture> dependencyFixtures(
+      Class<? extends Fixture>[] dependsOn, Properties baseFixtureProperties) {
+    return Stream.of(dependsOn)
+        .map(dependency -> dependencyFixture(dependency, baseFixtureProperties))
+        .collect(Collectors.toList());
+  }
+
+  private static WithFixture dependencyFixture(
+      Class<? extends Fixture> dependsOn, Properties baseFixtureProperties) {
+    return new WithFixture() {
+
+      @Override
+      public Class<? extends Annotation> annotationType() {
+        return WithFixture.class;
+      }
+
+      @Override
+      public Class<? extends Fixture> value() {
+        return dependsOn;
+      }
+
+      @Override
+      public String[] properties() {
+        return fromProperties(baseFixtureProperties);
+      }
+
+      @Override
+      public Lifecycle lifecycle() {
+        return null;
+      }
+
+      @Override
+      public Class<? extends Fixture>[] dependsOn() {
+        return EMPTY_FIXTURES;
+      }
+    };
+  }
+
   private static Optional<Constructor<? extends Fixture>> getConstructorWithProperties(
       Class<? extends Fixture> baseFixtureClass) {
     try {
@@ -104,5 +153,12 @@ public class FixtureFactory {
       }
     }
     return p;
+  }
+
+  private static String[] fromProperties(Properties p) {
+    return p.entrySet().stream()
+        .map(e -> e.getKey().toString() + "=" + e.getValue())
+        .collect(Collectors.toList())
+        .toArray(new String[] {});
   }
 }

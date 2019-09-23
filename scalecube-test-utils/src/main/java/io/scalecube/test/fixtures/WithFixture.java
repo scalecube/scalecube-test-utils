@@ -34,9 +34,19 @@ public @interface WithFixture {
   TestInstance.Lifecycle lifecycle() default Lifecycle.PER_CLASS;
 
   /**
-   * Properties for this fixture.
-   * use the format "k=v"
+   * Properties for this fixture. use the format "k=v"
+   *
    * @return
    */
   String[] properties() default {};
+
+  /**
+   * Dependency for this fixture. Injection for proxies provided by these fixtures is done from the
+   * constructor.
+   *
+   * @return a list of fixtures that this fixture might depend on.
+   * @implNote properties from the test will also be injected to the dependent class via the sole
+   *     constructor.
+   */
+  Class<? extends Fixture>[] dependsOn() default {};
 }
