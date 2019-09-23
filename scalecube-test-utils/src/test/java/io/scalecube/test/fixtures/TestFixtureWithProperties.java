@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @WithFixture(CallingInterfaceConstructor.class)
 @WithFixture(value = CallingPropertiesAndInterfaceConstructor.class, properties = "property=value")
 @WithFixture(value = CallingInterfaceAndPropertiesConstructor.class, properties = "property=value")
+@WithFixture(value = InjectedFixture.class, properties = "property=value", dependsOn =  CallingPropertiesAndInterfaceConstructor.class)
 public class TestFixtureWithProperties {
 
   @TestTemplate
@@ -41,6 +42,11 @@ public class TestFixtureWithProperties {
     } else if (testType.isAssignableFrom(CallingInterfaceAndPropertiesConstructor.class)
         || testType.isAssignableFrom(CallingPropertiesAndInterfaceConstructor.class)) {
       assertFalse(spy.constructorWasCalled());
+      assertTrue(spy.constructorWithInterfaceWasCalled());
+      assertTrue(spy.constructorWithPropertiesWasCalled());
+      assertEquals("value", p.getProperty("property"));
+    } else if (testType.isAssignableFrom(InjectedFixture.class)) {
+      assertTrue(spy.constructorWasCalled());
       assertTrue(spy.constructorWithInterfaceWasCalled());
       assertTrue(spy.constructorWithPropertiesWasCalled());
       assertEquals("value", p.getProperty("property"));
