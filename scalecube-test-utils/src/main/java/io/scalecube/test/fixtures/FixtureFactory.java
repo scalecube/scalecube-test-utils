@@ -23,9 +23,6 @@ import org.junit.platform.commons.util.AnnotationUtils;
  */
 public class FixtureFactory {
 
-  @SuppressWarnings("unchecked")
-  private static final Class<? extends Fixture>[] EMPTY_FIXTURES = new Class[] {};
-
   /**
    * Create a fixture object.
    *
@@ -125,7 +122,12 @@ public class FixtureFactory {
 
       @Override
       public Class<? extends Fixture>[] dependsOn() {
-        return EMPTY_FIXTURES;
+        List<Class<? extends Fixture>> dependencies =
+            AnnotationUtils.findRepeatableAnnotations(dependsOn, WithFixture.class).stream()
+                .map(WithFixture::value)
+                .collect(Collectors.toList());
+
+        return (Class<? extends Fixture>[]) dependencies.toArray(new Class[0]);
       }
     };
   }
