@@ -204,3 +204,89 @@ public class DockerfileFixture implements Fixture {
 }
 ```
 which will do the same in dockers!
+
+### New fetures in version 0.0.6
+Now there is the ability to re-use the same structural environment built with a single fixture into another:
+Let's say that the data layer of the application has an interface we want to facade in various ways:
+1. mock the data
+2. use sql database an old version
+3. use sql database with the newer version
+
+Other services works the same but must be connected to this data layer!
+Step one would be to create the basic model:
+``` java
+interface DataLayer {
+// ...
+}
+```
+``` java 
+class Service1 {
+   Service1(DataLayer data) {
+   // the service initializes here
+   }
+}
+```
+
+``` java 
+class Service2 {
+   Service2(DataLayer data) {
+   // the service initializes here
+   }
+}
+```
+
+Now we implement the 3 Fixtures:
+``` java
+@WithFixture(MockDataLayer.class)
+class EnvironmentWithMockData {
+    Service1 s1;
+    Service2 s2;
+    EnvironmentWithMockData(DataLayer data) {
+       s1 = new Service1(data);
+       s2 = new Service2(Data);
+   }
+   @Override
+   void setUp() {
+      // here we should create the connectivity
+   }
+// etc.   
+}
+```
+
+``` java
+@WithFixture(DatabaseWithVersion.class, properties="dbver=3.0.1")
+class EnvironmentWithOldDatabase {
+    Service1 s1;
+    Service2 s2;
+    EnvironmentWithOldDatabase(DataLayer data) {
+       s1 = new Service1(data);
+       s2 = new Service2(Data);
+   }
+   @Override
+   void setUp() {
+      // here we should create the connectivity
+   }
+// etc.   
+}
+```
+And finally 
+
+``` java
+@WithFixture(DatabaseWithVersion.class, properties="dbver=4.4.2")
+class EnvironmentWithNewDatabase {
+    Service1 s1;
+    Service2 s2;
+    EnvironmentWithNewDatabase(DataLayer data) {
+       s1 = new Service1(data);
+       s2 = new Service2(Data);
+   }
+   @Override
+   void setUp() {
+      // here we should create the connectivity
+   }
+// etc.   
+}
+```
+The `DatabaseWithVersion` and `MockDataLayer` classes implements `Fixture` and **must** return *non-null value* on `proxyFor()` with `DataLayer.class` as the parameter.
+
+If the main code of the fixture is the same you may want to inherit from a base Environment class.
