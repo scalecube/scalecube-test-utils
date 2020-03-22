@@ -7,15 +7,18 @@
   <parent>
     <groupId>io.scalecube</groupId>
     <artifactId>scalecube-parent-pom</artifactId>
-    <version>0.0.19</version>
+    <version>0.1.0-RC1</version>
   </parent>
+
   <packaging>pom</packaging>
+
   <scm>
     <url>https://github.com/scalecube/scalecube-test-utils</url>
     <connection>scm:git:git@github.com:scalecube/scalecube-test-utils.git</connection>
     <developerConnection>scm:git:git@github.com:scalecube/scalecube-test-utils.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
+
   <properties>
     <junit-jupiter.version>5.4.2</junit-jupiter.version>
   </properties>
@@ -25,4 +28,5 @@
     <module>scalecube-docker-fixture</module>
     <module>scalecube-fixtures-tck-flow</module>
   </modules>
+
 </project>
